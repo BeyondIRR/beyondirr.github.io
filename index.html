@@ -40,8 +40,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // CSV data URL or local CSV file path
-        const csvFilePath = 'path-to-your-file.csv'; // Replace this with your CSV file path
+        // Link to your CSV file hosted on S3
+        const csvFilePath = 'https://beyondirr-test-1.s3.ap-south-1.amazonaws.com/investedge/arn.csv'; // Replace this with the actual S3 URL
 
         // Array to hold the CSV data after parsing
         let data = [];
@@ -49,12 +49,16 @@
         // Function to load and parse the CSV file
         function loadCSV() {
             Papa.parse(csvFilePath, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
+                download: true, // Download the file directly
+                header: true,   // Treat the first row as headers
+                skipEmptyLines: true, // Skip any empty lines
                 complete: function(results) {
-                    data = results.data;
-                    populateTable(data);
+                    data = results.data; // Store the parsed data
+                    populateTable(data);  // Populate the table with data
+                },
+                error: function(error) {
+                    console.error("Error loading CSV: ", error);
+                    alert("Error loading CSV data. Please try again later.");
                 }
             });
         }
@@ -95,7 +99,7 @@
                 row['location'].toLowerCase().includes(searchQuery)
             );
 
-            populateTable(filteredData);
+            populateTable(filteredData); // Populate the table with filtered data
         }
 
         // Load CSV data when the page is loaded
