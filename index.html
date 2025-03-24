@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Searchable Excel Data</title>
+    <style>
+        #searchBox {
+            margin: 20px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Searchable Data Table</h1>
+        <input type="text" id="searchBox" placeholder="Search by Name, Email, or Location..." onkeyup="searchTable()">
+        <table id="dataTable">
+            <!-- Table headers will go here -->
+        </table>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script>
+        // CSV data URL or local CSV file path
+        const csvFilePath = 'path-to-your-file.csv'; // Replace this with your CSV file path
+
+        // Array to hold the CSV data after parsing
+        let data = [];
+
+        // Function to load and parse the CSV file
+        function loadCSV() {
+            Papa.parse(csvFilePath, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    data = results.data;
+                    populateTable(data);
+                }
+            });
+        }
+
+        // Function to populate the table with data
+        function populateTable(data) {
+            const table = document.getElementById('dataTable');
+            const header = `
+                <tr>
+                    <th>Serial</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Location</th>
+                    <th>Address</th>
+                </tr>`;
+            table.innerHTML = header;
+
+            data.forEach(row => {
+                const tableRow = `<tr>
+                    <td>${row['serial']}</td>
+                    <td>${row['name']}</td>
+                    <td>${row['email']}</td>
+                    <td>${row['location']}</td>
+                    <td>${row['address']}</td>
+                </tr>`;
+                table.innerHTML += tableRow;
+            });
+        }
+
+        // Function to filter the table based on the search input
+        function searchTable() {
+            const searchQuery = document.getElementById('searchBox').value.toLowerCase();
+
+            // Filter data based on name, email, and location
+            const filteredData = data.filter(row =>
+                row['name'].toLowerCase().includes(searchQuery) ||
+                row['email'].toLowerCase().includes(searchQuery) ||
+                row['location'].toLowerCase().includes(searchQuery)
+            );
+
+            populateTable(filteredData);
+        }
+
+        // Load CSV data when the page is loaded
+        window.onload = loadCSV;
+    </script>
+</body>
+</html>
